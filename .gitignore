@@ -1,0 +1,8 @@
+﻿# Ignore everything
+*
+
+# But not these files
+!data/
+!slides/slides_1/slides_1.pdf
+!slides/
+!slides/slides_1/
