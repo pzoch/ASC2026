@@ -1,0 +1,508 @@
+\documentclass[11pt,usenames,dvipsnames,aspectratio=169]{beamer}
+
+\usetheme[outer/progressbar=foot]{metropolis}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{polski}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\setbeamercolor{palette primary}{bg=BlueViolet,fg=white}
+\setbeamercolor{palette secondary}{bg=BlueViolet,fg=white}
+\setbeamercolor{title separator}{bg=Red,fg=BlueViolet}
+\setbeamercolor{progress bar}{bg=OrangeRed,fg=BlueViolet}
+
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathreplacing}
+
+\title{Dekompozycja szeregów czasowych}
+\subtitle{ASC 2026}
+\author{Piotr Żoch}
+\date{}
+\beamertemplatenavigationsymbolsempty
+
+\begin{document}
+
+\begin{frame}[plain]
+\vspace*{-0.6cm}
+\titlepage
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Plan}
+\begin{itemize}
+    \item Składowe szeregów czasowych.
+    \item Dekompozycja addytywna i multiplikatywna.
+    \item Obserwacje nietypowe.
+    \item Średnie ruchome.
+    \item Metody wyrównywania sezonowego: X-13, TRAMO/SEATS, STL.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Składowe szeregów czasowych}
+
+\begin{frame}{Składowe szeregów czasowych}
+\begin{center}
+\includegraphics[scale=0.4]{pasted2.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Składowe szeregów czasowych}
+\begin{center}
+\includegraphics[scale=0.4]{pasted3.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Składowe szeregów czasowych}
+\begin{itemize}
+    \item Składowa przypadkowa.
+    \item Składowa systematyczna (efekt oddziaływań stałego zestawu czynników na zmienną prognozowaną):
+    \begin{itemize}
+        \item Trend (tendencja rozwojowa).
+        \item Stały poziom (przeciętny długookresowy poziom zmiennej).
+        \item Składowa okresowa:
+        \begin{itemize}
+            \item Wahania sezonowe.
+            \item Wahania cykliczne.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Składowe szeregów czasowych}
+\begin{itemize}
+    \item \textbf{Tendencja rozwojowa (trend)}
+    \begin{itemize}
+        \item Długookresowa skłonność do jednokierunkowych zmian (wzrostu lub spadku) wartości badanej zmiennej.
+    \end{itemize}
+    \item \textbf{Stały (przeciętny) poziom}
+    \begin{itemize}
+        \item Występuje, gdy w szeregu czasowym nie ma tendencji rozwojowej, wartości zmiennej prognozowanej oscylują zaś wokół pewnego (stałego poziomu).
+    \end{itemize}
+    \item \textbf{Wahania cykliczne}
+    \begin{itemize}
+        \item Długookresowe rytmiczne wahania wartości wokół tendencji rozwojowej lub stałego (przeciętnego) poziomu.
+    \end{itemize}
+    \item \textbf{Wahania sezonowe}
+    \begin{itemize}
+        \item Wahania wartości obserwowanej zmiennej wokół tendencji rozwojowej lub stałego (przeciętnego) poziomu tej zmiennej. Mają skłonność do powtarzania się w określonym czasie.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Składowe szeregów czasowych}
+\begin{center}
+\includegraphics[scale=0.35]{pasted4.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Dekompozycja szeregów czasowych}
+\begin{itemize}
+    \item Wyodrębnienie poszczególnych składników nie zawsze jest łatwe z uwagi na rozmaite interakcje, które zachodzą pomiędzy nimi.
+    \item Różne metody dekompozycji (średnie ruchome, wydzielanie komponentów o różnej częstotliwości, procedury TRAMO/SEATS itd).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Trend i sezonowość}
+
+\begin{frame}{Trend}
+\begin{itemize}
+    \item Trend
+    \begin{itemize}
+        \item \textbf{deterministyczny}
+        \begin{align*}
+        y_{t} & =\alpha+\beta t+\epsilon_{t}\\
+        y_{t} & =\alpha+\beta t+\gamma t^{2}+\epsilon_{t}\\
+        y_{t} & =\kappa e^{\delta t}e^{\epsilon_{t}}\\
+        \epsilon_{t} & \sim iid\left(0,\sigma_{\epsilon}^{2}\right)
+        \end{align*}
+        \item \textbf{stochastyczny}
+        \begin{align*}
+        y_{t} & =\alpha+y_{t-1}+\epsilon_{t}\\
+        \epsilon_{t} & \sim iid\left(0,\sigma_{\epsilon}^{2}\right)
+        \end{align*}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Trend}
+\begin{center}
+\includegraphics[scale=0.3]{pasted6.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Trend}
+\begin{itemize}
+    \item W praktyce rozróżnienie może nie być łatwe\ldots
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.5]{pasted5.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Wahania sezonowe}
+\begin{itemize}
+    \item Dwa typy sezonowości:
+    \begin{itemize}
+        \item \textbf{Deterministyczna}
+        \begin{itemize}
+            \item Wartości obserwacji szeregu cechującego się sezonowością deterministyczną wahają się z amplitudą względnie stałą.
+            \item Proces, którego bezwarunkowa średnia zależy od podokresu roku (np.\ miesiąca, kwartału).
+            \item Ten rodzaj sezonowości jest modelowany za pomocą zmiennych zerojedynkowych, ich liczba zależna od liczby okresów w roku.
+        \end{itemize}
+        \item \textbf{Stochastyczna}
+        \begin{itemize}
+            \item Charakteryzuje się zmiennym w czasie wzorcem sezonowości.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Wahania sezonowe}
+\begin{itemize}
+    \item Deterministyczna sezonowość (przykład):
+    \[
+    y_{t}=\sum_{s=1}^{S}\delta_{t,s}\,m_{s}+\epsilon_{t}
+    \]
+    $\delta_{t,s}=1$ jeśli okres $t$ przypada na sezon $s$ (np.\ $\delta_{t,12}=1$ jeśli okres $t$ to grudzień w przypadku danych miesięcznych).
+    \item Stochastyczna sezonowość (przykład -- sezonowy pierwiastek jednostkowy):
+    \[
+    y_{t}=y_{t-S}+\epsilon_{t}
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Dekompozycja addytywna i multiplikatywna}
+
+\begin{frame}{Metody wyrównywania sezonowego}
+\begin{itemize}
+    \item Punktem wyjścia jest założenie, że szereg czasowy można zdekomponować na elementy:
+    \begin{itemize}
+        \item \textbf{czynnik sezonowy} $S_{t}$ -- regularne fluktuacje sezonowe;
+        \item \textbf{cykl i trend} $C_{t}$ -- długookresowy trend, cykl koniunkturalny i inne składniki cykliczne;
+        \item \textbf{trading-day} $TD_{t}$ -- kształt kalendarza -- korekta ze względu na różną długość miesięcy, liczbę dni roboczych itp.;
+        \item \textbf{składnik losowy} $I_{t}$.
+    \end{itemize}
+    \item Chcemy uzyskać dane wyrównane sezonowo $SA_{t}$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Postać addytywna}
+\begin{itemize}
+    \item \textbf{Postać addytywna}
+    \begin{align*}
+    Y_{t} & =S_{t}+C_{t}+TD_{t}+I_{t}\\
+    SA_{t} & =C_{t}+I_{t}
+    \end{align*}
+    czyli amplituda wahań sezonowych i losowych jest stała.
+    \item Czynnik sezonowy $S_t$ wyraża się w jednostkach zmiennej $Y_t$ (np.\ mld PLN).
+    \item Warunek normalizacji: $\sum_{s=1}^{S}S_{t_s}=0$ w obrębie każdego roku.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Postać multiplikatywna}
+\begin{itemize}
+    \item \textbf{Postać multiplikatywna}
+    \begin{align*}
+    Y_{t} & =S_{t}\times C_{t}\times TD_{t}\times I_{t}\\
+    SA_{t} & =C_{t}\times I_{t}
+    \end{align*}
+    czyli amplituda wahań sezonowych i losowych zależy od trendu.
+    \item Czynnik sezonowy $S_t$ jest bezwymiarowy (np.\ $S_t=1{,}05$ oznacza, że wartość w tym sezonie jest o 5\% wyższa od trend-cyklu).
+    \item Warunek normalizacji: $\sum_{s=1}^{S}S_{t_s}=S$ (średnia równa 1).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Postać addytywna vs postać multiplikatywna}
+\begin{center}
+\includegraphics[scale=0.5]{pasted7.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Postać addytywna vs postać multiplikatywna}
+\begin{center}
+\includegraphics[scale=0.4]{pasted8.png}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Transformacja logarytmiczna}
+\begin{itemize}
+    \item Model multiplikatywny można sprowadzić do addytywnego stosując logarytm:
+    \begin{align*}
+    Y_{t} & =S_{t}\times C_{t}\times I_{t}\\
+    \ln Y_{t} & =\ln S_{t}+\ln C_{t}+\ln I_{t}
+    \end{align*}
+    \item Dlatego w praktyce często pracujemy na zlogarytmowanych danych.
+    \item Dodatkowa zaleta: logarytm stabilizuje wariancję (jeśli wariancja rośnie proporcjonalnie do poziomu zmiennej).
+    \item W kontekście wyrównywania sezonowego: wybór między dekompozycją addytywną a multiplikatywną jest jedną z pierwszych decyzji w procedurze.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Obserwacje nietypowe}
+
+\begin{frame}{Obserwacje nietypowe}
+\begin{itemize}
+    \item \textbf{O charakterze jednorazowym} \emph{(additive outlier (AO))} powodujące zmianę wartości zmiennej zależnej tylko w jednym okresie
+    \[
+    AO_{t}^{(t_{0})}=\begin{cases}
+    1 & t=t_{0}\\
+    0 & t\neq t_{0}
+    \end{cases}
+    \]
+    \item Wpływ na szereg (addytywnie): $y_t = f(t) + \omega \cdot AO_t^{(t_0)} + \varepsilon_t$, gdzie $\omega$ to wielkość zaburzenia.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Obserwacje nietypowe}
+\begin{itemize}
+    \item \textbf{O charakterze przejściowym} \emph{(temporary change (TC))}, powodujące tymczasowe przesunięcie poziomu zmiennej zależnej, przy czym powrót ze skokowej zmiany wartości zmiennej zależnej do poziomu pierwotnego następuje zgodnie z funkcją wykładniczą w postaci
+    \[
+    TC_{t}^{(t_{0})}=\begin{cases}
+    0 & t<t_{0}\\
+    \alpha^{t-t_{0}} & t\geq t_{0}
+    \end{cases}
+    \]
+    gdzie $\alpha\in(0,1)$ kontroluje szybkość powrotu (typowo $\alpha=0{,}7$).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Obserwacje nietypowe}
+\begin{itemize}
+    \item \textbf{O charakterze długotrwałym} \emph{(level shift (LS))}, powodujące trwałe przesunięcie poziomu zmiennej zależnej
+    \[
+    LS_{t}^{(t_{0})}=\begin{cases}
+    0 & t<t_{0}\\
+    1 & t\geq t_{0}
+    \end{cases}
+    \]
+    \item W modelach regARIMA (TRAMO, X-13) obserwacje nietypowe są identyfikowane automatycznie i uwzględniane jako zmienne objaśniające:
+    \[
+    y_t = \sum_i \omega_i \cdot O_t^{(t_i)} + \underbrace{x_t'\beta + z_t}_{\text{regARIMA}} + \varepsilon_t
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Średnie ruchome}
+
+\begin{frame}{Średnie ruchome}
+\begin{itemize}
+    \item Symetryczna średnia ruchoma rzędu $2q+1$:
+    \[
+    \hat{C}_{t}=\sum_{j=-q}^{q}w_{j}\,y_{t-j}
+    \]
+    gdzie $w_{j}=w_{-j}$ oraz $\sum_{j}w_{j}=1$.
+    \item Aby wyeliminować sezonowość o okresie $S$, stosujemy średnią ruchomą o długości $S$ (np.\ 12 dla danych miesięcznych, 4 dla kwartalnych).
+    \item Dla parzystego $S$ stosujemy średnią $2\times S$:
+    \[
+    \hat{C}_{t}=\frac{1}{S}\!\left(\frac{1}{2}y_{t-S/2}+y_{t-S/2+1}+\cdots+y_{t+S/2-1}+\frac{1}{2}y_{t+S/2}\right)
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Średnie ruchome: właściwości}
+\begin{itemize}
+    \item Średnia ruchoma to \textbf{filtr liniowy}: przekształca szereg wejściowy $\{y_t\}$ na wyjściowy $\{\hat{C}_t\}$ za pomocą wag $\{w_j\}$.
+    \item Średnia ruchoma o długości $S$ \textbf{eliminuje składową sezonową} o okresie $S$: jeśli $S_t$ jest periodyczna z okresem $S$ i $\sum_{s=1}^S S_{t_s} = 0$, to
+    \[
+    \frac{1}{S}\sum_{j=0}^{S-1} S_{t-j} = 0
+    \]
+    \item Jednocześnie zachowuje trend: jeśli $C_t = a + bt$, to $\hat{C}_t = a + bt$ (dla symetrycznych wag sumujących się do 1).
+    \item Problem: średnia ruchoma nie daje wartości na końcach próby (brak obserwacji przyszłych) -- tu właśnie pomaga model ARIMA w X-13.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Filtr Hendersona}
+\begin{itemize}
+    \item W metodzie X-12/X-13 do estymacji trendu używa się \textbf{filtru Hendersona}, a nie prostej średniej ruchomej.
+    \item Filtr Hendersona minimalizuje $\sum_{t}\!\left(\nabla^{3}\hat{C}_{t}\right)^{2}$, tj.\ sumę kwadratów trzeciej różnicy estymowanego trendu.
+    \item Formalne sformułowanie: szukamy wag $\{w_j\}_{j=-q}^{q}$ rozwiązujących
+    \[
+    \min_{\{w_j\}} \sum_t \left(\Delta^3 \hat{C}_t\right)^2 \quad \text{p.w.} \quad \sum_j w_j = 1,\;\; \sum_j j^k w_j = 0 \;\text{ dla } k=1,2
+    \]
+    \item Typowe długości filtra: 9 lub 13 (dane miesięczne), 5 lub 7 (dane kwartalne).
+    \item Wybór długości zależy od stosunku zmienności komponentu nieregularnego do zmienności trend-cyklu (\emph{I/C ratio}).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Metody wyrównywania sezonowego}
+
+\begin{frame}{Metody wyrównywania sezonowego}
+\begin{itemize}
+    \item Dwie popularne metody to:
+    \begin{itemize}
+        \item \textbf{X-12-ARIMA} (obecnie X-13-ARIMA-SEATS)
+        \item \textbf{TRAMO/SEATS}
+    \end{itemize}
+    \item Obie dostępne w programie \textbf{JDemetra+} (opracowany przez Eurostat, darmowy).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{X-13-ARIMA-SEATS: struktura}
+\begin{itemize}
+    \item Program składa się z dwóch etapów:
+    \begin{enumerate}
+        \item \textbf{regARIMA} -- wstępne oczyszczenie szeregu (patrz następny slajd).
+        \item \textbf{X-11} lub \textbf{SEATS} -- właściwa dekompozycja na komponenty.
+    \end{enumerate}
+    \item Kolejność: najpierw regARIMA usuwa z szeregu efekty kalendarzowe i obserwacje nietypowe, a następnie X-11 lub SEATS dekomponuje oczyszczony szereg.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{regARIMA}
+\begin{itemize}
+    \item Model regARIMA to model regresji, w którym reszty mają strukturę SARIMA:
+    \[
+    y_t = \underbrace{x_t'\beta}_{\text{regresory}} + \underbrace{z_t}_{\text{reszty SARIMA}}
+    \]
+    \item Regresory $x_t$ mogą obejmować: zmienne sezonowe, efekty kalendarzowe (trading-day, Wielkanoc), obserwacje nietypowe (AO, TC, LS).
+    \item Reszty $z_t$ spełniają model SARIMA:
+    \[
+    \phi(B)\,\Phi(B^S)\,(1-B)^d(1-B^S)^D\, z_t = \theta(B)\,\Theta(B^S)\,\varepsilon_t
+    \]
+    \item Po estymacji modelu obliczamy \textbf{zlinearyzowany szereg}: $\tilde{y}_t = y_t - x_t'\hat{\beta}$, który trafia do X-11 lub SEATS.
+    \item Model SARIMA służy też do \textbf{prognozowania} wartości na końcach próby (potrzebnych do filtrów symetrycznych).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{X-11: algorytm iteracyjny}
+\small
+\begin{itemize}
+    \item Metoda ad hoc, dobór filtrów nie zależy od właściwości statystycznych szeregu.
+    \item Nieco myląca nazwa -- model ARIMA jest wykorzystywany jedynie do estymacji wartości prognozowanych.
+    \begin{enumerate}
+        \item Trend obliczany za pomocą średnich ruchomych (filtr $2\times 12$ lub $2\times 4$).
+        \item Odjąć trend od szeregu, pozostaje komponent sezonowy i nieregularny: $\hat{S}_t + \hat{I}_t = Y_t - \hat{C}_t$.
+        \item Komponent sezonowy obliczany za pomocą średnich ruchomych (sezonowe $3\times 3$, $3\times 5$ lub $3\times 9$).
+        \item Odjąć komponent sezonowy od szeregu: $\hat{SA}_t = Y_t - \hat{S}_t$.
+        \item Ponowić (1) i (2) z filtrem Hendersona dla trendu.
+        \item Ponowić (3) i (4) z nieco innymi wagami.
+        \item Otrzymać trend i komponent nieregularny odejmując uzyskany w~(6) komponent sezonowy od szeregu.
+    \end{enumerate}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{X-11: filtry sezonowe}
+\begin{itemize}
+    \item W kroku (3) stosujemy \textbf{sezonowe średnie ruchome}: osobna średnia ruchoma dla każdego miesiąca/kwartału.
+    \item Np.\ filtr $3\times 3$ dla danych miesięcznych: dla każdego miesiąca $s$ stosujemy dwukrotnie prostą średnią z~trzech kolejnych lat, co daje ważoną średnią z~pięciu lat:
+    \[
+    \hat{S}_{t}^{(s)} = \frac{1}{9}\!\left(y_{t-24}^{SI}+2y_{t-12}^{SI}+3y_t^{SI}+2y_{t+12}^{SI}+y_{t+24}^{SI}\right)
+    \]
+    gdzie $y_t^{SI} = Y_t - \hat{C}_t$.
+    \item Następnie normalizacja: $\hat{S}_t \leftarrow \hat{S}_t - \overline{\hat{S}}$ (addytywnie) lub $\hat{S}_t \leftarrow \hat{S}_t / \overline{\hat{S}}$ (multiplikatywnie).
+    \item Wybór filtra ($3\times 3$, $3\times 5$, $3\times 9$) zależy od stabilności wzorca sezonowego: im bardziej zmienny, tym krótszy filtr.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{TRAMO/SEATS}
+\begin{itemize}
+    \item \textbf{TRAMO} (``Time Series Regression with ARIMA Noise, Missing Observations and Outliers''): dopasowuje proces SARIMAX do szeregu i oczyszcza szereg z wpływu wybranych czynników $X$ (kalendarzowych, nietypowych\ldots) za pomocą tego modelu.
+    \item \textbf{SEATS} (``Seasonal Extraction in ARIMA Time Series''): korzysta ze specyfikacji SARIMA, by zdekomponować szereg na elementy: trendu, sezonowości, nieregularny.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{SEATS: dekompozycja oparta na modelu}
+\begin{itemize}
+    \item Załóżmy, że zlinearyzowany szereg ma model SARIMA:
+    \[
+    \phi(B)\,\Phi(B^S)\,(1-B)^d(1-B^S)^D\,y_t = \theta(B)\,\Theta(B^S)\,\varepsilon_t
+    \]
+    \item SEATS dekomponuje to na \textbf{nieobserwowalne komponenty}:
+    \[
+    y_t = C_t + S_t + I_t
+    \]
+    gdzie każdy komponent ma własny model ARIMA, np.:
+    \begin{align*}
+    \phi_C(B)\,(1-B)^d\,C_t &= \theta_C(B)\,\varepsilon_t^C \\
+    \phi_S(B)\,(1-B^S)^D\,S_t &= \theta_S(B)\,\varepsilon_t^S
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{SEATS: ekstrakcja sygnału}
+\begin{itemize}
+    \item Ekstrakcja sygnału za pomocą \textbf{filtrów Wienera-Kołmogorowa} -- optymalnych filtrów liniowych minimalizujących błąd średniokwadratowy.
+    \item Intuicja: mając model ARIMA całego szeregu i modele poszczególnych komponentów, możemy obliczyć optymalną estymację każdego komponentu warunkując na obserwacjach $\{y_1,\ldots,y_T\}$:
+    \[
+    \hat{C}_t = E\!\left[C_t \mid y_1, \ldots, y_T\right]
+    \]
+    \item Filtry te są \textbf{wyznaczone przez model ARIMA} -- nie wymagają arbitralnych wyborów (jak długość filtra w X-11).
+    \item Kluczowa różnica wobec X-11: filtry dostosowane do właściwości statystycznych konkretnego szeregu (a nie ad hoc).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{X-11 vs SEATS: porównanie}
+\begin{itemize}
+    \item \textbf{X-11}:
+    \begin{itemize}
+        \item Metoda nieparametryczna (filtry ad hoc).
+        \item Nie wymaga specyfikacji modelu.
+        \item Sprawdzona, stabilna procedura (używana od lat 60.).
+    \end{itemize}
+    \item \textbf{TRAMO/SEATS}:
+    \begin{itemize}
+        \item Metoda parametryczna (oparta na modelu SARIMA).
+        \item Filtry optymalne w sensie MSE.
+        \item Dostarcza błędy standardowe komponentów.
+    \end{itemize}
+    \item W praktyce wyniki obu metod są zazwyczaj bardzo zbliżone.
+    \item X-13-ARIMA-SEATS łączy obie metody w jednym programie.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Dekompozycja STL}
+\begin{itemize}
+    \item \textbf{STL} (\emph{Seasonal and Trend decomposition using Loess}) -- Cleveland et al.\ (1990).
+    \item Iteracyjna procedura wykorzystująca lokalną regresję wielomianową (loess) do estymacji trendu i sezonowości.
+    \item Zalety:
+    \begin{itemize}
+        \item Elastyczność -- użytkownik kontroluje gładkość trendu i sezonowości.
+        \item Odporność na obserwacje nietypowe (wersja robust).
+        \item Może obsługiwać dowolną częstotliwość danych.
+    \end{itemize}
+    \item Ograniczenia:
+    \begin{itemize}
+        \item Tylko dekompozycja addytywna (multiplikatywną uzyskujemy przez logarytm).
+        \item Nie ma wbudowanego modelowania efektów kalendarzowych ani obserwacji nietypowych (w odróżnieniu od X-13 i TRAMO/SEATS).
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\end{document}
