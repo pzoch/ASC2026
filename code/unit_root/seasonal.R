@@ -139,7 +139,7 @@ ap_year_df <- do.call(
   rbind,
   lapply(selected_years, function(year) {
     year_window <- window(AirPassengers, start = c(year, 1), end = c(year, 12))
-    data.frame(year = factor(year), month = cycle(year_window), value = as.numeric(year_window))
+    data.frame(year = factor(year), month = c(cycle(year_window)), value = c(year_window))
   })
 )
 
@@ -159,7 +159,7 @@ lap_year_df <- do.call(
   rbind,
   lapply(selected_years, function(year) {
     year_window <- window(lAP, start = c(year, 1), end = c(year, 12))
-    data.frame(year = factor(year), month = cycle(year_window), value = as.numeric(year_window))
+    data.frame(year = factor(year), month = c(cycle(year_window)), value = c(year_window))
   })
 )
 

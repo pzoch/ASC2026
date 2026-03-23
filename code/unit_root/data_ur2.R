@@ -41,9 +41,33 @@ run_bg_loop <- function(model, orders) {
     p_value = sapply(bg_results, function(res) res$p.value)
   )
 
-  cat("\nBreusch-Godfrey LM tests (ADF residual autocorrelation)\n")
+  cat("\nBreusch-Godfrey LM tests\n")
   print(bg_summary, row.names = FALSE)
   invisible(bg_results)
+}
+
+adf_bg_table <- function(y_zoo, type = "none", max_lag = 6, bg_order = 4) {
+  dy <- diff(y_zoo)
+  results <- lapply(0:max_lag, function(p) {
+    if (p == 0) {
+      lag_part <- ""
+    } else {
+      lag_part <- paste("+", paste0("L(dy, ", 1:p, ")", collapse = " + "))
+    }
+    fml_str <- switch(type,
+      none  = paste("dy ~ L(y_zoo, 1)", lag_part, "- 1"),
+      drift = paste("dy ~ L(y_zoo, 1)", lag_part),
+      trend = paste("dy ~ L(y_zoo, 1) + trend(dy)", lag_part)
+    )
+    reg <- dynlm(as.formula(fml_str))
+    bg <- bgtest(reg, order = bg_order)
+    data.frame(
+      adf_lags = p,
+      BG_stat = round(as.numeric(bg$statistic), 3),
+      BG_pval = round(bg$p.value, 4)
+    )
+  })
+  do.call(rbind, results)
 }
 
 project_root <- find_project_root()
@@ -105,23 +129,26 @@ print(summary(ur.df(y, type = "drift", lags = 5)))
 print(summary(ur.df(y, type = "trend", lags = 5)))
 print(summary(ur.df(as.numeric(dy_zoo), type = "drift", lags = 4)))
 
-# BG test for the trend-ADF specification ----------------------------------
+# BG tests across ADF lag lengths -------------------------------------------
+cat("\nBG test (order 4) for ADF(trend) with varying lag lengths\n")
+print(adf_bg_table(y_zoo, type = "trend", max_lag = 8, bg_order = 4))
+
+# Residual diagnostics for the chosen specification (5 lags) ----------------
 trend_zoo <- zoo(seq_along(y), order.by = agg_data$date)
 reg_df <- dynlm(
   dy_zoo ~ L(y_zoo, 1) + trend_zoo +
     L(dy_zoo, 1) + L(dy_zoo, 2) + L(dy_zoo, 3) + L(dy_zoo, 4) + L(dy_zoo, 5)
 )
-print(summary(reg_df))
 
 reg_resid <- residuals(reg_df)
 print(
   ggAcf(as.numeric(reg_resid), lag.max = 12) +
-    labs(title = "Trend-ADF residuals - ACF", x = "Lag", y = "ACF") +
+    labs(title = "Trend-ADF(5) residuals - ACF", x = "Lag", y = "ACF") +
     plot_theme
 )
 print(
   ggPacf(as.numeric(reg_resid), lag.max = 12) +
-    labs(title = "Trend-ADF residuals - PACF", x = "Lag", y = "PACF") +
+    labs(title = "Trend-ADF(5) residuals - PACF", x = "Lag", y = "PACF") +
     plot_theme
 )
 

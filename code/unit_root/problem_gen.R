@@ -31,9 +31,33 @@ run_bg_loop <- function(model, orders) {
     p_value = sapply(bg_results, function(res) res$p.value)
   )
 
-  cat("\nBreusch-Godfrey LM tests (ADF residual autocorrelation)\n")
+  cat("\nBreusch-Godfrey LM tests\n")
   print(bg_summary, row.names = FALSE)
   invisible(bg_results)
+}
+
+adf_bg_table <- function(y_zoo, type = "none", max_lag = 6, bg_order = 4) {
+  dy <- diff(y_zoo)
+  results <- lapply(0:max_lag, function(p) {
+    if (p == 0) {
+      lag_part <- ""
+    } else {
+      lag_part <- paste("+", paste0("L(dy, ", 1:p, ")", collapse = " + "))
+    }
+    fml_str <- switch(type,
+      none  = paste("dy ~ L(y_zoo, 1)", lag_part, "- 1"),
+      drift = paste("dy ~ L(y_zoo, 1)", lag_part),
+      trend = paste("dy ~ L(y_zoo, 1) + trend(dy)", lag_part)
+    )
+    reg <- dynlm(as.formula(fml_str))
+    bg <- bgtest(reg, order = bg_order)
+    data.frame(
+      adf_lags = p,
+      BG_stat = round(as.numeric(bg$statistic), 3),
+      BG_pval = round(bg$p.value, 4)
+    )
+  })
+  do.call(rbind, results)
 }
 
 simulate_ar2 <- function(phi, n, sigma2 = 1, seed = NULL) {
@@ -79,12 +103,10 @@ print(summary(df_test2))
 print(summary(df_test3))
 print(summary(df_test4))
 
-# BG test on an augmented DF regression -------------------------------------
+# BG tests across ADF lag lengths -------------------------------------------
 x_zoo <- zoo(x)
-dx_zoo <- diff(x_zoo)
-reg_df <- dynlm(dx_zoo ~ L(x_zoo, 1) + L(dx_zoo, 2) - 1)
-print(summary(reg_df))
-run_bg_loop(reg_df, orders = 1:4)
+cat("\nBG test (order 4) for ADF(none) with varying lag lengths\n")
+print(adf_bg_table(x_zoo, type = "none", max_lag = 6, bg_order = 4))
 
 # KPSS tests ----------------------------------------------------------------
 kpss_test1 <- ur.kpss(x, type = "mu")

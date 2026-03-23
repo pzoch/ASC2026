@@ -2,7 +2,14 @@
 *
 
 # But not these files
+!.gitignore
 !data/
-!slides/slides_1/slides_1.pdf
+!data/*
+!code/
+!code/*/
+!code/**/*.R
 !slides/
-!slides/slides_1/
+!slides/*/
+!slides/**/*.tex
+!slides/**/*.pdf
+!slides/**/*.png
