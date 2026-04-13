@@ -1,0 +1,537 @@
+\documentclass[11pt,usenames,dvipsnames,aspectratio=169]{beamer}
+
+\usetheme[outer/progressbar=foot]{metropolis}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{polski}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\setbeamercolor{palette primary}{bg=BlueViolet,fg=white}
+\setbeamercolor{palette secondary}{bg=BlueViolet,fg=white}
+\setbeamercolor{title separator}{bg=Red,fg=BlueViolet}
+\setbeamercolor{progress bar}{bg=OrangeRed,fg=BlueViolet}
+
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathreplacing}
+
+\title{Modele ARMA}
+\subtitle{ASC 2026}
+\author{Piotr Żoch}
+\date{}
+\beamertemplatenavigationsymbolsempty
+
+\begin{document}
+
+\begin{frame}[plain]
+\vspace*{-0.6cm}
+\titlepage
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Plan}
+\begin{itemize}
+    \item Model AR
+    \item Model MA
+    \item Modele ARMA
+    \item Prognozy
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{ARMA}
+
+\begin{frame}{ARMA}
+\begin{itemize}
+    \item \textbf{AR:} \textbf{\emph{autoregressive}}
+    \item \textbf{MA:} \textbf{\emph{moving average}}
+\end{itemize}
+\[
+y_{t}=a_{0}+\underbrace{\sum_{i=1}^{p}a_{i}y_{t-i}}_{AR(p)}+\underbrace{\sum_{i=0}^{q}\theta_{i}\varepsilon_{t-i}}_{MA(q)}
+\]
+gdzie $\theta_{0}\equiv 1$.
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Funkcja reakcji na impuls}
+\begin{itemize}
+    \item Stacjonarny proces ARMA
+    \[
+    A(L)\,y_{t}=a_{0}+\theta(L)\,\varepsilon_{t}
+    \]
+    można zapisać jako
+    \begin{align*}
+    y_{t} & =\sum_{j=0}^{\infty}\psi_{j}L^{j}\varepsilon_{t}+\kappa_{t}\\
+    \psi_{0} & =1
+    \end{align*}
+    gdzie $\kappa_{t}$ jest składnikiem deterministycznym.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Funkcja reakcji na impuls}
+\begin{itemize}
+    \item Mnożnik dynamiczny mierzy efekt $\varepsilon_{t}$ na wartości $\{y_{t+h}\}_{h=0}^{\infty}$:
+    \[
+    \frac{\partial y_{t+h}}{\partial \varepsilon_{t}}=\frac{\partial y_{h}}{\partial \varepsilon_{0}}=\psi_{h}
+    \]
+    \item Funkcja reakcji na impuls to $\{\psi_{h}\}_{h=0}^{\infty}$ -- mówi nam o tym, jak reagują wartości $\{y_{t+h}\}_{h=0}^{\infty}$ na jednorazowy impuls/szok $\varepsilon_{t}$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Funkcja reakcji na impuls}
+\begin{itemize}
+    \item Mnożnik skumulowany: efekt permanentnej zmiany $\varepsilon_{t}=\varepsilon_{t+1}=\varepsilon_{t+2}=\cdots$
+    \[
+    \frac{\partial y_{t+h}}{\partial \varepsilon_{t}}+\frac{\partial y_{t+h}}{\partial \varepsilon_{t+1}}+\cdots+\frac{\partial y_{t+h}}{\partial \varepsilon_{t+h}}=\sum_{j=0}^{h}\psi_{h-j}
+    \]
+    \item Dla $h\rightarrow\infty$ mamy $\sum_{j=0}^{\infty}\psi_{j}=\Psi(1)$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Model AR}
+
+\begin{frame}{Model AR}
+\begin{itemize}
+    \item Model AR($p$) \emph{(rzędu $p$):}
+    \[
+    y_{t}=a_{0}+a_{1}y_{t-1}+a_{2}y_{t-2}+\ldots+a_{p}y_{t-p}+\epsilon_{t}
+    \]
+    gdzie $\epsilon_{t}$ i.i.d. z wartością oczekiwaną $0$ i wariancją $\sigma^{2}$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR(1)}
+\begin{itemize}
+    \item \textbf{Przykład} -- AR(1)
+    \[
+    y_{t}=\rho y_{t-1}+\epsilon_{t}
+    \]
+    można zapisać jako
+    \[
+    y_{t}=\epsilon_{t}+\rho\epsilon_{t-1}+\rho^{2}\epsilon_{t-2}+\cdots
+    \]
+    jeśli $|\rho|<1$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR(1)}
+\begin{itemize}
+    \item Mamy
+    \[
+    y_{t}=\epsilon_{t}+\rho\epsilon_{t-1}+\rho^{2}\epsilon_{t-2}+\cdots
+    \]
+    \item Mnożnik dynamiczny:
+    \[
+    \frac{\partial y_{t+h}}{\partial \epsilon_{t}}=\rho^{h}
+    \]
+    \item Mnożnik skumulowany:
+    \[
+    1+\rho+\rho^{2}+\cdots=\frac{1}{1-\rho}
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$)}
+\begin{itemize}
+    \item Model AR($p$) to
+    \[
+    y_{t}=a_{0}+a_{1}y_{t-1}+a_{2}y_{t-2}+\ldots+a_{p}y_{t-p}+\epsilon_{t}
+    \]
+    \item Możemy zbadać stabilność analizując pierwiastki \emph{wielomianu opóźnień} (szczegółowa dyskusja wielomianów opóźnień na kolejnych zajęciach)
+    \[
+    1-a_{1}L-a_{2}L^{2}-\cdots-a_{p}L^{p}.
+    \]
+    \item Stabilność gdy wszystkie pierwiastki są \emph{poza} kołem jednostkowym.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$)}
+\begin{itemize}
+    \item Inne spojrzenie na model AR($p$): niech $x_{1,t}=y_{t},\; x_{2,t}=y_{t-1},\; x_{3,t}=y_{t-2},\;\ldots,\; x_{p,t}=y_{t-p+1}$.
+    \item Możemy zapisać AR($p$) jako
+\end{itemize}
+{\small
+\[
+\begin{bmatrix}
+x_{1,t}\\ x_{2,t}\\ x_{3,t}\\ \vdots\\ x_{p,t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+a_{0}\\ 0\\ 0\\ \vdots\\ 0
+\end{bmatrix}
++
+\begin{bmatrix}
+a_{1} & a_{2} & \cdots & a_{p-1} & a_{p}\\
+1     & 0     & \cdots & 0       & 0\\
+0     & 1     & \cdots & 0       & 0\\
+\vdots& \vdots& \ddots & \vdots  & \vdots\\
+0     & 0     & \cdots & 1       & 0
+\end{bmatrix}
+\begin{bmatrix}
+x_{1,t-1}\\ x_{2,t-1}\\ x_{3,t-1}\\ \vdots\\ x_{p,t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+1\\ 0\\ 0\\ \vdots\\ 0
+\end{bmatrix}\epsilon_{t}
+\]
+}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$)}
+\begin{itemize}
+    \item Sprawdźmy -- pierwszy wiersz to
+    \[
+    \underbrace{x_{1,t}}_{y_{t}}=a_{0}+a_{1}\underbrace{x_{1,t-1}}_{y_{t-1}}+a_{2}\underbrace{x_{2,t-1}}_{y_{t-2}}+\ldots+a_{p}\underbrace{x_{p,t-1}}_{y_{t-p}}+\epsilon_{t}.
+    \]
+    \item Drugi wiersz to
+    \[
+    \underbrace{x_{2,t}}_{y_{t-1}}=\underbrace{x_{1,t-1}}_{y_{t-1}}.
+    \]
+    \item Kolejne wiersze są podobne do drugiego.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$)}
+\begin{itemize}
+    \item W zwartej postaci:
+    \[
+    \mathbf{x}_{t}=\mathbf{c}+\mathbf{A}\,\mathbf{x}_{t-1}+\mathbf{b}\,\epsilon_{t},
+    \qquad \mathbf{c}=\begin{bmatrix}a_{0}\\0\\\vdots\\0\end{bmatrix},\;
+    \mathbf{b}=\begin{bmatrix}1\\0\\\vdots\\0\end{bmatrix}
+    \]
+    \item Ważne: występuje tylko pierwsze opóźnienie wektora $\mathbf{x}_{t}$.
+    \item Korzyść: możemy badać czy AR($p$) da się zapisać jako MA$(\infty)$, analizując macierz $\mathbf{A}$. Iteracyjne podstawianie daje
+    \[
+    \mathbf{x}_{t}=\sum_{j=0}^{\infty}\mathbf{A}^{j}\mathbf{b}\,\epsilon_{t-j}+\text{(część deterministyczna)},
+    \]
+    co zbiega, gdy wszystkie wartości własne $\mathbf{A}$ są co do modułu mniejsze od $1$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$) -- momenty}
+\begin{itemize}
+    \item Wartość oczekiwana:
+    \[
+    E[y_{t}]=a_{0}+a_{1}E[y_{t-1}]+a_{2}E[y_{t-2}]+\ldots+a_{p}E[y_{t-p}]+E[\epsilon_{t}],
+    \]
+    gdzie $E[\epsilon_{t}]=0$.
+    \item Dla procesu stacjonarnego $E[y_{t}]=E[y_{t-1}]=\cdots$, czyli
+    \[
+    E[y_{t}]=\frac{a_{0}}{1-a_{1}-a_{2}-\cdots-a_{p}}.
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model AR($p$) -- momenty}
+\begin{itemize}
+    \item Równania \textbf{Yule'a-Walkera}: kowariancja $\gamma_{k}\equiv Cov(y_{t},y_{t-k})$ spełnia
+    \begin{align*}
+    \gamma_{k} & =a_{1}\gamma_{k-1}+\cdots+a_{p}\gamma_{k-p}, \qquad k\geq 1\\
+    \gamma_{0} & =a_{1}\gamma_{1}+\cdots+a_{p}\gamma_{p}+\sigma^{2}
+    \end{align*}
+    \item Korelacja:
+    \[
+    \rho_{k}=a_{1}\rho_{k-1}+\cdots+a_{p}\rho_{k-p}
+    \]
+    \item Mnożniki (dla $k\geq p$):
+    \[
+    \psi_{k}=a_{1}\psi_{k-1}+\cdots+a_{p}\psi_{k-p}
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Model MA}
+
+\begin{frame}{Model MA}
+\begin{itemize}
+    \item Model MA($q$) \emph{(rzędu $q$):}
+    \[
+    y_{t}=\mu+\epsilon_{t}+\theta_{1}\epsilon_{t-1}+\ldots+\theta_{q}\epsilon_{t-q}
+    \]
+    gdzie $\epsilon_{t}$ i.i.d. z wartością oczekiwaną $0$ i wariancją $\sigma^{2}$.
+    \item Model średniej ruchomej (\emph{moving average}) to średnia ważona procesu białego szumu z bieżącego oraz $q$ poprzednich okresów.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model MA}
+\begin{itemize}
+    \item Trudność: jak oszacować parametry tego modelu?
+    \begin{itemize}
+        \item Nie obserwujemy $\epsilon_{t},\epsilon_{t-1},\ldots$ w danych.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Momenty MA($q$)}
+\begin{itemize}
+    \item Momenty modelu MA($q$) (przyjmując $\theta_{0}\equiv 1$):
+    \begin{align*}
+    E[y_{t}] & =\mu\\
+    Var[y_{t}] & =(1+\theta_{1}^{2}+\ldots+\theta_{q}^{2})\,\sigma^{2}\\
+    Cov[y_{t},y_{t-k}] & =\begin{cases}
+    \sigma^{2}\sum_{j=0}^{q-k}\theta_{j}\theta_{j+k} & k\leq q\\
+    0 & k>q
+    \end{cases}
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Odwracalność}
+\begin{itemize}
+    \item Rozważmy model MA(1)
+    \begin{align*}
+    y_{t} & =\epsilon_{t}+\theta_{1}\epsilon_{t-1}\\
+         & =(1+\theta_{1}L)\,\epsilon_{t}
+    \end{align*}
+    \item Można go zapisać jako
+    \[
+    \epsilon_{t}=y_{t}-\theta_{1}y_{t-1}+\theta_{1}^{2}y_{t-2}-\theta_{1}^{3}y_{t-3}+\cdots
+    \]
+    jeśli $|\theta_{1}|<1$.
+    \item W tym wypadku mówimy, że model MA(1) jest \textbf{odwracalny} i można przedstawić MA(1) jako AR($\infty$).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Momenty MA(1)}
+\begin{itemize}
+    \item Momenty
+    \[
+    y_{t}=\epsilon_{t}+\theta_{1}\epsilon_{t-1}
+    \]
+    to
+    \begin{align*}
+    \gamma_{0} & =(1+\theta_{1}^{2})\,\sigma^{2}\\
+    \gamma_{1} & =\theta_{1}\,\sigma^{2}
+    \end{align*}
+    \item Autokorelacja
+    \[
+    \rho_{1}=\frac{\theta_{1}}{1+\theta_{1}^{2}}=\frac{1/\theta_{1}}{1+(1/\theta_{1})^{2}}
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Odwracalność}
+\begin{itemize}
+    \item Dwa modele MA(1)
+    \begin{align*}
+    y_{t} & =\epsilon_{t}+\theta_{1}\epsilon_{t-1}\\
+    y_{t} & =\epsilon_{t}+\tfrac{1}{\theta_{1}}\epsilon_{t-1}
+    \end{align*}
+    mają taką samą autokorelację (ACF).
+    \item Jeden z nich jest odwracalny, drugi nie.
+    \item Ten odwracalny nazywamy \textbf{postacią fundamentalną} modelu MA(1).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\section{Modele ARMA w praktyce}
+
+\begin{frame}{Model ARMA}
+\[
+y_{t}=a_{0}+\sum_{i=1}^{p}a_{i}y_{t-i}+\sum_{i=0}^{q}\theta_{i}\epsilon_{t-i}, \qquad \theta_{0}\equiv 1
+\]
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Model ARMA}
+\begin{itemize}
+    \item Jak dobrać $(p,q)$?
+    \begin{itemize}
+        \item Metoda Boxa-Jenkinsa (1970)
+        \item Kryteria informacyjne
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda Boxa-Jenkinsa}
+\begin{itemize}
+    \item Idea: użyć wykresów ACF i PACF do identyfikacji rzędów $p$ i $q$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{ACF}
+\begin{itemize}
+    \item Funkcja autokorelacji (\emph{Autocorrelation Function}) to współczynnik korelacji między dwiema realizacjami oddalonymi od siebie o $k$ okresów:
+    \[
+    \rho_{k}=\frac{Cov(y_{t},y_{t-k})}{Var(y_{t})},\qquad \rho_{k}\in[-1,1].
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{PACF}
+\begin{itemize}
+    \item Funkcja autokorelacji cząstkowej (\emph{Partial Autocorrelation Function}) to współczynnik korelacji między dwiema realizacjami oddalonymi od siebie o $k$ okresów, bez uwzględnienia wpływu wszystkich obserwacji ,,pomiędzy''.
+    \item Funkcja ta jest równa wyestymowanemu współczynnikowi $\alpha_{k}$ w modelu autoregresyjnym $k$-tego rzędu
+    \[
+    y_{t}=\mu+\alpha_{1}y_{t-1}+\cdots+\alpha_{k}y_{t-k}+\varepsilon_{t}.
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda Boxa-Jenkinsa}
+\begin{itemize}
+    \item Idea: użyć wykresów ACF i PACF do identyfikacji rzędów $p$ i $q$.
+    \begin{itemize}
+        \item Dla MA: $Cov[y_{t},y_{t-k}]=0$ dla $k>q$, więc w ACF istotnych jest $q$ pierwszych opóźnień.
+        \item Dla AR: w PACF istotnych jest $p$ pierwszych opóźnień.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda Boxa-Jenkinsa}
+\begin{itemize}
+    \item Ustalenie wartości $p$ i $q$ na podstawie wykresu ACF i PACF.
+    \item Estymacja parametrów modelu ARMA($p,q$).
+    \item Weryfikacja modelu ARMA($p,q$):
+    \begin{itemize}
+        \item Dla modelu ARMA($p^{*},q^{*}$), gdzie $p^{*}\geq p$ i $q^{*}\geq q$, weryfikuje się istotność dodatkowych opóźnień.
+        \item Sprawdza się, czy występuje autokorelacja reszt.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Kryteria informacyjne}
+\begin{itemize}
+    \item \textbf{Kryteria informacyjne:} wybrać specyfikację o wysokiej wartości logarytmu funkcji wiarygodności $\ell=\ln L$ i niskiej liczbie szacowanych parametrów $k=p+q+1$.
+    \item Najczęściej stosowane: Akaike'a (AIC), Schwarza (BIC) oraz Hannana-Quinna (HQIC):
+    \begin{align*}
+    AIC  & =-2\,\frac{\ell}{T}+2\,\frac{k}{T}\\
+    BIC  & =-2\,\frac{\ell}{T}+\frac{k}{T}\ln T\\
+    HQIC & =-2\,\frac{\ell}{T}+2\,\frac{k}{T}\ln(\ln T)
+    \end{align*}
+    \item Nagroda za dobre dopasowanie do danych, kara za liczbę parametrów.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda od ogólnego do szczegółowego}
+\begin{itemize}
+    \item Polega na stopniowym upraszczaniu możliwie najogólniejszego modelu początkowego.
+    \item Ograniczenia narzucane na model definiowane przez zagnieżdżone hipotezy:
+    \begin{itemize}
+        \item $H_{0}^{K}$ zawiera najwięcej ograniczeń, $H_{0}^{1}$ najmniej.
+    \end{itemize}
+    \item Hipotezą alternatywną jest zawsze postać ogólna.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda od ogólnego do szczegółowego}
+\begin{itemize}
+    \item Przykład -- postać ogólna:
+    \[
+    y_{t}=\beta_{1}y_{t-1}+\beta_{2}y_{t-2}+\epsilon_{t}
+    \]
+    i postacie szczególne:
+    \begin{align*}
+    y_{t} & =\beta_{1}y_{t-1}+0\cdot y_{t-2}+\epsilon_{t}\\
+    y_{t} & =0\cdot y_{t-1}+\beta_{2}y_{t-2}+\epsilon_{t}\\
+    y_{t} & =0\cdot y_{t-1}+0\cdot y_{t-2}+\epsilon_{t}
+    \end{align*}
+    \item Problem: w jakiej kolejności testować?
+    \item W przypadku szeregów czasowych zazwyczaj zagnieżdżanie pod względem kolejności opóźnień.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Metoda od ogólnego do szczegółowego}
+\begin{itemize}
+    \item Test LR (\emph{likelihood ratio}):
+    \[
+    LR=-2\big[\ell(\theta_{R})-\ell(\theta)\big]
+    \]
+    gdzie $\ell(\theta_{R})$ odpowiada modelowi z restrykcjami. Można użyć tylko w przypadku modeli zagnieżdżonych.
+    \item Przy $H_{0}$ (restrykcje) statystyka testowa ma rozkład $\chi^{2}$ z liczbą stopni swobody równą liczbie liniowo niezależnych restrykcji.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Prognoza punktowa}
+\[
+y_{t}=a_{0}+\sum_{i=1}^{p}a_{i}y_{t-i}+\epsilon_{t}+\sum_{i=1}^{q}\theta_{i}\epsilon_{t-i}
+\]
+Przyjmijmy, że znamy $y_{t}$ oraz reszty $e_{t}$ dla $t\leq T$. Interesuje nas prognoza na okresy $T+1,\,T+2,\ldots$
+\[
+y_{T+1}=a_{0}+\sum_{i=1}^{p}a_{i}y_{T+1-i}+\sum_{i=1}^{q}\theta_{i}e_{T+1-i}+\epsilon_{T+1}
+\]
+czyli
+\[
+E_{T}[y_{T+1}]=a_{0}+\sum_{i=1}^{p}a_{i}y_{T+1-i}+\sum_{i=1}^{q}\theta_{i}e_{T+1-i}.
+\]
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Prognoza punktowa}
+\begin{itemize}
+    \item Prognozy punktowe obliczamy w sposób rekurencyjny:
+    \begin{align*}
+    E_{T}[y_{T+2}] & =a_{0}+a_{1}E_{T}[y_{T+1}]+\sum_{i=2}^{p}a_{i}y_{T+2-i}+\sum_{i=2}^{q}\theta_{i}e_{T+2-i}.
+    \end{align*}
+    \item Dla $k>p$ i $k>q$ mamy
+    \[
+    E_{T}[y_{T+k}]=a_{0}+\sum_{i=1}^{p}a_{i}E_{T}[y_{T+k-i}].
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Wariancja błędu prognozy}
+\begin{itemize}
+    \item Postać MA($\infty$):
+    \[
+    y_{t}=\epsilon_{t}+\psi_{1}\epsilon_{t-1}+\psi_{2}\epsilon_{t-2}+\cdots
+    \]
+    \item Błąd losowy prognozy:
+    \begin{align*}
+    y_{T+1}-E_{T}[y_{T+1}] & =\epsilon_{T+1}\\
+    y_{T+2}-E_{T}[y_{T+2}] & =\epsilon_{T+2}+\psi_{1}\epsilon_{T+1}
+    \end{align*}
+    i tak dalej:
+    \[
+    y_{T+k}-E_{T}[y_{T+k}]=\epsilon_{T+k}+\sum_{i=1}^{k-1}\psi_{i}\epsilon_{T+k-i}.
+    \]
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------
+\begin{frame}{Wariancja błędu prognozy}
+\begin{itemize}
+    \item Ponieważ $Cov[\epsilon_{t},\epsilon_{s}]=0$ dla $s\neq t$ oraz $Var[\epsilon_{t}]=\sigma_{\epsilon}^{2}$, mamy
+    \[
+    \sigma_{k}^{2}=Var[y_{T+k}-E_{T}[y_{T+k}]]=\sigma_{\epsilon}^{2}\Big(1+\sum_{i=1}^{k-1}\psi_{i}^{2}\Big).
+    \]
+    \item Nie uwzględnia to innych źródeł błędu prognozy (np. błędnej specyfikacji).
+    \item $\sigma_{k}^{2}$ wykorzystujemy do stworzenia prognozy przedziałowej.
+\end{itemize}
+\end{frame}
+
+\end{document}
