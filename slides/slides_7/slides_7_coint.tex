@@ -1,0 +1,394 @@
+\documentclass[11pt,aspectratio=169,xcolor=dvipsnames]{beamer}
+
+\usetheme[
+  outer/progressbar=foot,
+]{metropolis}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{polish}
+
+\IfFontExistsTF{Fira Sans Light}{
+  \setsansfont[BoldFont={Fira Sans}]{Fira Sans Light}
+}{
+  \setsansfont{Arial}
+}
+\IfFontExistsTF{Fira Mono}{
+  \setmonofont{Fira Mono}
+}{
+  \setmonofont{Menlo}
+}
+
+\setbeamercolor{palette primary}{bg=BlueViolet,fg=white}
+\setbeamercolor{palette secondary}{bg=BlueViolet,fg=white}
+\setbeamercolor{title separator}{bg=Red,fg=BlueViolet}
+\setbeamercolor{progress bar}{bg=OrangeRed,fg=BlueViolet}
+\beamertemplatenavigationsymbolsempty
+
+\newcommand{\rank}{\operatorname{rank}}
+
+\title{Kointegracja i VECM}
+\subtitle{ASC 2026}
+\author{Piotr Żoch}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \vspace{1.2cm}
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}Kointegracja i VECM\par}
+  \vspace{0.35cm}
+  {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}ASC 2026\par}
+  \vspace{0.9cm}
+  {\usebeamerfont{author}Piotr Żoch\par}
+\end{frame}
+
+\begin{frame}{Plan}
+  \begin{itemize}
+    \item Regresja pozorna
+    \item Kointegracja
+    \item Testowanie kointegracji
+    \item ECM
+    \item VECM
+  \end{itemize}
+\end{frame}
+
+\section{Kointegracja}
+
+\begin{frame}{Regresja pozorna}
+  \small
+  Modelowanie zależności między niepowiązanymi zmiennymi niestacjonarnymi może prowadzić do regresji pozornej:
+  \begin{align*}
+    x_t &= x_{t-1} + \varepsilon_t,\\
+    y_t &= y_{t-1} + \nu_t.
+  \end{align*}
+
+  W regresji
+  \[
+    y_t = \alpha + \beta x_t + u_t
+  \]
+  często otrzymujemy wysokie $R^2$ i istotne statystyki $t$, mimo że zmienne są niezależne.
+
+  \begin{itemize}
+    \item Typowa reakcja: różnicowanie.
+    \item Problem: różnicowanie może wyrzucić informację o długookresowej równowadze.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Wspólny trend stochastyczny}
+  Zmienne mogą być niestacjonarne, ale mieć wspólny trend:
+  \begin{align*}
+    x_t &= z_t + \varepsilon_t,\\
+    y_t &= z_t + \nu_t,\\
+    z_t &= z_{t-1} + \zeta_t.
+  \end{align*}
+
+  Wtedy
+  \[
+    x_t - y_t = \varepsilon_t - \nu_t.
+  \]
+
+  \begin{itemize}
+    \item $x_t$ i $y_t$ są $I(1)$.
+    \item Różnica $x_t-y_t$ może być $I(0)$.
+    \item Krótkookresowo zmienne mogą się od siebie oddalać, ale długookresowo poruszają się razem.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Kointegracja}
+  Niech $x_t=(x_{1t},\ldots,x_{nt})'$ będzie wektorem zmiennych $I(d)$.
+
+  Jeśli istnieje niezerowy wektor $\beta=(\beta_1,\ldots,\beta_n)'$, taki że
+  \[
+    \beta'x_t \sim I(d-b), \qquad b>0,
+  \]
+  to zmienne są skointegrowane stopnia $(d,b)$.
+
+  \begin{itemize}
+    \item W praktyce najczęściej: $d=b=1$.
+    \item Wtedy kombinacja liniowa zmiennych $I(1)$ jest stacjonarna.
+    \item $\beta$ nazywamy wektorem kointegrującym.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Wektor i rząd kointegracji}
+  \begin{itemize}
+    \item Kointegracja dotyczy kombinacji liniowej.
+    \item Jeśli $\beta$ jest wektorem kointegrującym, to $\lambda\beta$ dla $\lambda\neq 0$ też nim jest.
+    \item Dlatego zwykle normalizujemy jeden parametr, np. przyjmujemy współczynnik przy $y_t$ równy 1.
+    \item Dla $n$ zmiennych może istnieć najwyżej $n-1$ liniowo niezależnych wektorów kointegrujących.
+    \item Liczba takich wektorów to rząd kointegracji.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Długookresowa relacja}
+  Jeśli $y_t$ i $x_t$ są skointegrowane, to w regresji
+  \[
+    y_t = \alpha + \beta x_t + u_t
+  \]
+  reszta $u_t$ jest stacjonarna.
+
+  \begin{itemize}
+    \item Interpretacja: $u_t$ to odchylenie od długookresowej równowagi.
+    \item Gdy $y_t$ oddala się od $\alpha+\beta x_t$, system ma tendencję do powrotu.
+    \item Estymator MNK relacji długookresowej jest super-zgodny, ale standardowe rozkłady statystyk nie działają bezpośrednio.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Kointegracja a różnicowanie}
+  Jeśli zmienne są skointegrowane, regresja na różnicach:
+  \[
+    \Delta y_t = \gamma \Delta x_t + e_t
+  \]
+  opisuje tylko zależność krótkookresową.
+
+  \begin{itemize}
+    \item Tracimy informację o poziomie równowagi.
+    \item Możemy otrzymać obciążony obraz zależności długookresowej.
+    \item Potrzebujemy modelu, który zawiera:
+      \begin{itemize}
+        \item krótkookresową dynamikę w różnicach,
+        \item korektę odchylenia od równowagi.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Testowanie kointegracji}
+
+\begin{frame}{Testowanie kointegracji}
+  Podstawowy schemat:
+  \begin{enumerate}
+    \item Sprawdź stopień integracji zmiennych.
+    \item Jeśli zmienne są $I(0)$, kointegracja nie jest potrzebna.
+    \item Jeśli zmienne są zintegrowane różnego stopnia, nie mogą być skointegrowane w standardowym sensie.
+    \item Jeśli zmienne są $I(1)$, testuj stacjonarność relacji długookresowej.
+  \end{enumerate}
+
+  \vspace{0.3cm}
+  Wybór testu:
+  \begin{itemize}
+    \item dwie zmienne: Engle--Granger,
+    \item wiele zmiennych i możliwy rząd kointegracji większy niż 1: Johansen.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Test Engle--Granger}
+  Krok 1: oszacuj relację długookresową:
+  \[
+    y_t = \alpha + \beta x_t + u_t.
+  \]
+
+  Krok 2: testuj pierwiastek jednostkowy w resztach:
+  \[
+    \Delta \hat{u}_t
+      = \rho \hat{u}_{t-1}
+      + \sum_{i=1}^{k}\phi_i \Delta \hat{u}_{t-i}
+      + e_t.
+  \]
+
+  \[
+    H_0:\rho=0
+    \qquad
+    H_1:\rho<0.
+  \]
+
+  Odrzucenie $H_0$ sugeruje kointegrację.
+\end{frame}
+
+\begin{frame}{Test Engle--Granger -- uwagi}
+  \begin{itemize}
+    \item Nie używamy zwykłych wartości krytycznych z testu ADF.
+    \item Reszty $\hat{u}_t$ są skonstruowane po estymacji $\alpha$ i $\beta$.
+    \item Wartości krytyczne zależą od:
+      \begin{itemize}
+        \item liczby zmiennych,
+        \item deterministycznych składników w relacji długookresowej,
+        \item trendu lub dryfu w zmiennych.
+      \end{itemize}
+    \item Test Engle--Granger zakłada jeden wektor kointegrujący i jest wrażliwy na wybór zmiennej po lewej stronie.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Test Johansena}
+  Test Johansena wychodzi od reprezentacji VECM:
+  \[
+    \Delta y_t
+      = \Pi y_{t-1}
+      + \sum_{i=1}^{p-1}\Gamma_i \Delta y_{t-i}
+      + \Phi D_t
+      + \varepsilon_t.
+  \]
+
+  Kluczowy obiekt:
+  \[
+    r = \rank(\Pi).
+  \]
+
+  \begin{itemize}
+    \item $r=0$: brak kointegracji.
+    \item $0<r<n$: istnieje $r$ relacji kointegrujących.
+    \item $r=n$: zmienne są stacjonarne w poziomach.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Test Johansena -- intuicja}
+  Jeśli $0<r<n$, macierz $\Pi$ można rozłożyć jako
+  \[
+    \Pi = \alpha\beta',
+  \]
+  gdzie:
+  \begin{itemize}
+    \item $\beta$ zawiera wektory kointegrujące,
+    \item $\beta'y_{t-1}$ to odchylenia od równowagi długookresowej,
+    \item $\alpha$ opisuje tempo dostosowania poszczególnych zmiennych do tych odchyleń.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  Testy Johansena sprawdzają kolejne hipotezy o rzędzie $r$.
+\end{frame}
+
+\section{ECM i VECM}
+
+\begin{frame}{Model korekty błędem}
+  Twierdzenie Grangera o reprezentacji:
+
+  jeśli $y_t$ i $x_t$ są $I(1)$ oraz skointegrowane, to zależność między nimi można przedstawić jako ECM:
+  \[
+    \Delta y_t
+      = \kappa
+      + \sum_{i=0}^{K-1}\gamma_i\Delta x_{t-i}
+      + \sum_{i=1}^{L-1}\theta_i\Delta y_{t-i}
+      + \delta (y_{t-1}-\alpha-\beta x_{t-1})
+      + \varepsilon_t.
+  \]
+
+  \begin{itemize}
+    \item Część w różnicach: dynamika krótkookresowa.
+    \item Nawias: odchylenie od równowagi długookresowej.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Interpretacja ECM}
+  Niech
+  \[
+    e_t = y_t - \alpha - \beta x_t.
+  \]
+
+  W ECM:
+  \[
+    \Delta y_t = \kappa + \delta e_{t-1} + \cdots + \varepsilon_t.
+  \]
+
+  \begin{itemize}
+    \item $e_{t-1}$ mierzy odchylenie od równowagi.
+    \item $\delta$ opisuje tempo powrotu do równowagi.
+    \item Zwykle oczekujemy $\delta<0$ w równaniu dla $\Delta y_t$.
+    \item Przybliżony okres połowicznego wygaśnięcia:
+      \[
+        -\frac{\ln 2}{\ln(1+\delta)}.
+      \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Od VAR do VECM}
+  Startujemy od VAR($p$):
+  \[
+    y_t = A_1y_{t-1} + \ldots + A_py_{t-p} + \varepsilon_t.
+  \]
+
+  Po odjęciu $y_{t-1}$ i przekształceniu:
+  \[
+    \Delta y_t
+      = \Pi y_{t-1}
+      + \sum_{i=1}^{p-1}\Gamma_i\Delta y_{t-i}
+      + \varepsilon_t,
+  \]
+  gdzie
+  \[
+    \Pi = A_1 + \ldots + A_p - I.
+  \]
+
+  \begin{itemize}
+    \item To jest VECM: vector error correction model.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{VECM}
+  Gdy zmienne są skointegrowane:
+  \[
+    \Pi = \alpha\beta'.
+  \]
+
+  \[
+    \Delta y_t
+      = \alpha\beta'y_{t-1}
+      + \sum_{i=1}^{p-1}\Gamma_i\Delta y_{t-i}
+      + \Phi D_t
+      + \varepsilon_t.
+  \]
+
+  \begin{itemize}
+    \item $\beta'y_{t-1}$: relacje długookresowe.
+    \item $\alpha$: prędkości dostosowania.
+    \item $\Gamma_i$: krótkookresowa dynamika.
+    \item $D_t$: stała, trend, sezonowość, zmienne interwencyjne.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{VAR, różnice czy VECM?}
+  \begin{center}
+    \begin{tabular}{lll}
+      \toprule
+      Dane & Relacje długookresowe & Model \\
+      \midrule
+      $I(0)$ & nie dotyczy & VAR w poziomach \\
+      $I(1)$ & brak kointegracji & VAR w różnicach \\
+      $I(1)$ & kointegracja & VECM \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.4cm}
+  \begin{itemize}
+    \item VAR w poziomach może być dobry prognostycznie, ale wymaga ostrożnej inferencji.
+    \item VECM łączy krótkookresową dynamikę z długookresową równowagą.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{R: podstawowy schemat}
+\tiny
+\begin{verbatim}
+library(vars)
+library(urca)
+
+# 1. stopien integracji
+summary(ur.df(y[, "m"], type = "drift", lags = 4))
+summary(ur.df(y[, "p"], type = "drift", lags = 4))
+
+# 2. test Johansena i estymacja VECM
+jo <- ca.jo(y, type = "trace", ecdet = "const", K = 4)
+summary(jo)
+vecm <- cajorls(jo, r = 1)
+
+# 3. VAR odpowiadajacy VECM, np. do IRF
+var_from_vecm <- vec2var(jo, r = 1)
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Najważniejsze wnioski}
+  \begin{itemize}
+    \item Regresja niestacjonarnych zmiennych może być pozorna.
+    \item Kointegracja oznacza, że pewna kombinacja liniowa zmiennych $I(1)$ jest stacjonarna.
+    \item Test Engle--Granger działa dla prostej relacji długookresowej.
+    \item Test Johansena pozwala badać rząd kointegracji w układzie wielu zmiennych.
+    \item VECM łączy krótkookresową dynamikę z korektą błędem.
+  \end{itemize}
+\end{frame}
+
+\end{document}

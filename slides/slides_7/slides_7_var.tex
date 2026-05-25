@@ -1,0 +1,278 @@
+\documentclass[11pt,aspectratio=169,xcolor=dvipsnames]{beamer}
+
+\usetheme[
+  outer/progressbar=foot,
+]{metropolis}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{polish}
+
+\IfFontExistsTF{Fira Sans Light}{
+  \setsansfont[BoldFont={Fira Sans}]{Fira Sans Light}
+}{
+  \setsansfont{Arial}
+}
+\IfFontExistsTF{Fira Mono}{
+  \setmonofont{Fira Mono}
+}{
+  \setmonofont{Menlo}
+}
+
+\setbeamercolor{palette primary}{bg=BlueViolet,fg=white}
+\setbeamercolor{palette secondary}{bg=BlueViolet,fg=white}
+\setbeamercolor{title separator}{bg=Red,fg=BlueViolet}
+\setbeamercolor{progress bar}{bg=OrangeRed,fg=BlueViolet}
+\beamertemplatenavigationsymbolsempty
+
+\newcommand{\E}{\mathbb{E}}
+
+\title{Modele VAR}
+\subtitle{ASC 2026}
+\author{Piotr Żoch}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \vspace{1.2cm}
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}Modele VAR\par}
+  \vspace{0.35cm}
+  {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}ASC 2026\par}
+  \vspace{0.9cm}
+  {\usebeamerfont{author}Piotr Żoch\par}
+\end{frame}
+
+\begin{frame}{Plan}
+  \begin{itemize}
+    \item Model VAR
+    \item Budowa modelu VAR
+    \item Stabilność
+    \item Estymacja i diagnostyka
+    \item Prognozowanie, IRF i FEVD
+  \end{itemize}
+\end{frame}
+
+\section{Model VAR}
+
+\begin{frame}{Model VAR}
+  \begin{itemize}
+    \item VAR: \textbf{v}ector \textbf{a}uto\textbf{r}egression.
+    \item Modeluje wspólną dynamikę wielu zmiennych bez narzucania z góry podziału na zmienne endogeniczne i egzogeniczne.
+    \item Przydatny do:
+      \begin{itemize}
+        \item prognozowania szeregów czasowych,
+        \item opisu zależności dynamicznych,
+        \item analizy reakcji zmiennych na zaburzenia.
+      \end{itemize}
+    \item Przy dodatkowych założeniach identyfikacyjnych prowadzi do modeli SVAR.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Model VAR}
+  Niech
+  \[
+    y_t = (y_{1,t}, y_{2,t}, \ldots, y_{n,t})'.
+  \]
+  Model VAR($p$):
+  \[
+    y_t = A_0 + A_1 y_{t-1} + A_2 y_{t-2} + \ldots + A_p y_{t-p} + \varepsilon_t,
+  \]
+  gdzie
+  \[
+    \varepsilon_t \sim (0,\Sigma).
+  \]
+
+  \begin{itemize}
+    \item $A_0$ to wektor $n \times 1$.
+    \item $A_1,\ldots,A_p$ oraz $\Sigma$ to macierze $n \times n$.
+    \item Można dodać zmienne deterministyczne: stałą, trend, zmienne sezonowe, zmienne zero-jedynkowe.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Model VAR}
+  Ten sam model można zapisać za pomocą wielomianu opóźnień:
+  \[
+    \left(I - A_1L - A_2L^2 - \ldots - A_pL^p\right)y_t = A_0 + \varepsilon_t,
+  \]
+  czyli
+  \[
+    A(L)y_t = A_0 + \varepsilon_t.
+  \]
+
+  \begin{itemize}
+    \item Każde równanie ma te same zmienne objaśniające: opóźnienia wszystkich zmiennych z układu.
+    \item Parametry pojedynczych równań zwykle nie są głównym obiektem interpretacji.
+    \item Interesuje nas raczej cała dynamika systemu.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Dlaczego VAR?}
+  \begin{itemize}
+    \item Modele VAR powstały jako odpowiedź na problemy dużych modeli strukturalnych:
+      \begin{itemize}
+        \item arbitralny podział na zmienne endogeniczne i egzogeniczne,
+        \item arbitralny wybór struktury dynamicznej,
+        \item problemy z identyfikacją,
+        \item słaba jakość prognoz w niektórych zastosowaniach.
+      \end{itemize}
+    \item Podejście VAR jest bardziej ateoretyczne:
+      \begin{itemize}
+        \item teoria pomaga wybrać zmienne,
+        \item dane pomagają opisać zależności dynamiczne.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Budowa modelu VAR}
+  Dwie podstawowe decyzje:
+  \begin{itemize}
+    \item jakie zmienne uwzględnić,
+    \item jaki rząd opóźnień $p$ wybrać.
+  \end{itemize}
+
+  \vspace{0.5cm}
+  Dobór rzędu opóźnień:
+  \begin{itemize}
+    \item kryteria informacyjne: AIC, BIC, HQIC,
+    \item testy istotności kolejnych opóźnień,
+    \item diagnostyka reszt: brak autokorelacji i stabilna wariancja,
+    \item sens ekonomiczny i częstotliwość danych.
+  \end{itemize}
+\end{frame}
+
+\section{Stabilność}
+
+\begin{frame}{VAR -- stacjonarność}
+  Dla AR($p$) analizowaliśmy pierwiastki wielomianu opóźnień:
+  \[
+    A(L)y_t = a_0 + \varepsilon_t.
+  \]
+
+  Analogicznie w VAR($p$):
+  \[
+    A(L)y_t = A_0 + \varepsilon_t.
+  \]
+
+  \begin{itemize}
+    \item VAR jest stabilny, jeśli pierwiastki równania
+      \[
+        \det A(z)=0
+      \]
+      leżą poza kołem jednostkowym.
+    \item Intuicyjnie: wpływ jednorazowego szoku wygasa w czasie.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{VAR(1) i wartości własne}
+  Dla VAR(1):
+  \[
+    y_t = A_1 y_{t-1} + \varepsilon_t.
+  \]
+
+  Warunek stabilności:
+  \[
+    \det(I - A_1z)=0
+  \]
+  ma pierwiastki poza kołem jednostkowym.
+
+  \begin{itemize}
+    \item Równoważnie: wartości własne macierzy $A_1$ są w kole jednostkowym.
+    \item Łatwo się pomylić:
+      \begin{itemize}
+        \item pierwiastki wielomianu opóźnień: poza kołem,
+        \item wartości własne macierzy przejścia: w kole.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Estymacja i diagnostyka}
+
+\begin{frame}{Estymacja i diagnostyka}
+  \begin{itemize}
+    \item Parametry VAR można estymować metodą najmniejszych kwadratów, równanie po równaniu.
+    \item Po estymacji sprawdzamy:
+      \begin{itemize}
+        \item autokorelację reszt,
+        \item stabilność modelu,
+        \item istotność opóźnień,
+        \item jakość prognoz poza próbą.
+      \end{itemize}
+    \item Autokorelacja reszt zwykle oznacza zbyt niski rząd opóźnień lub pominiętą strukturę deterministyczną.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Niestacjonarne zmienne w VAR}
+  Co zrobić, jeśli zmienne w VAR są niestacjonarne?
+
+  \begin{itemize}
+    \item Oszacować VAR na poziomach:
+      \begin{itemize}
+        \item dobre dla prognoz i analizy zależności,
+        \item ale klasyczna inferencja może być problematyczna.
+      \end{itemize}
+    \item Oszacować VAR na pierwszych różnicach:
+      \begin{itemize}
+        \item usuwa część niestacjonarności,
+        \item ale traci informację o długookresowych relacjach.
+      \end{itemize}
+    \item Jeśli zmienne są skointegrowane: użyć VECM.
+  \end{itemize}
+\end{frame}
+
+\section{Prognozy i impulsy}
+
+\begin{frame}{Prognozowanie z VAR}
+  \[
+    y_t = A_0 + A_1y_{t-1} + \ldots + A_py_{t-p} + \varepsilon_t.
+  \]
+
+  Prognozy iteracyjne:
+  \begin{align*}
+    \E_T[y_{T+1}] &=
+      A_0 + A_1y_T + A_2y_{T-1} + \ldots + A_py_{T-p+1},\\
+    \E_T[y_{T+2}] &=
+      A_0 + A_1\E_T[y_{T+1}] + A_2y_T + \ldots + A_py_{T-p+2}.
+  \end{align*}
+
+  \begin{itemize}
+    \item W kolejnych krokach prognozy zastępują nieobserwowane przyszłe wartości.
+    \item Przedziały prognoz wymagają wariancji błędów prognozy.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{VAR i reprezentacja VMA}
+  Dla stabilnego VAR istnieje reprezentacja VMA($\infty$):
+  \[
+    y_t = \mu + \sum_{i=0}^{\infty}\Theta_i\varepsilon_{t-i}.
+  \]
+
+  \begin{itemize}
+    \item Macierze $\Theta_i$ opisują rozchodzenie się zaburzeń w czasie.
+    \item Na tej reprezentacji opierają się:
+      \begin{itemize}
+        \item funkcje reakcji na impuls,
+        \item dekompozycja wariancji błędów prognozy,
+        \item analiza mechanizmów transmisji.
+      \end{itemize}
+    \item W modelu zredukowanym reszty mogą być współskorelowane, więc interpretacja szoków wymaga ostrożności.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Najważniejsze wnioski}
+  \begin{itemize}
+    \item VAR opisuje wspólną dynamikę wielu zmiennych.
+    \item Dobór opóźnień i diagnostyka reszt są kluczowe.
+    \item Stabilność oznacza wygasanie skutków szoków.
+    \item Prognozy VAR otrzymujemy iteracyjnie.
+    \item IRF i FEVD opierają się na reprezentacji VMA modelu VAR.
+  \end{itemize}
+\end{frame}
+
+\end{document}
